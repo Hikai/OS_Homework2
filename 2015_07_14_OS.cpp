@@ -13,6 +13,9 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	LARGE_INTEGER fileIOSize;
 	fileIOSize.QuadPart = 3221225472;
+	LARGE_INTEGER writeSize;
+	writeSize.QuadPart = 1073741824;
+	PUCHAR buf = 0;
 
 	_ASSERTE(create_very_big_file(L"big_4MB.txt", 4));
 
@@ -42,7 +45,14 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	StopWatch sw4;
 	sw4.Start();
-	_ASSERTE(file_copy_using_memory_map(L"More_than_5GB.txt", L"BigfileMMIO.txt"));
+	FileIoHelper * cluster;
+	cluster = new FileIoHelper();
+	cluster->FIOpenForRead(L"More_than_5GB.txt");
+	cluster->FIOCreateFile(L"BigfileFIOH.txt", fileIOSize);
+	cluster->FIOWriteToFile(writeSize, 1073741824, buf);
+	cluster->FIOWriteToFile(writeSize, 1073741824, buf);
+	cluster->FIOWriteToFile(writeSize, 1073741824, buf);
+	delete cluster;
 	sw4.Stop();
 	print("info] MMIO 3GB time elapsed = %f", sw.GetDurationMilliSecond());
 
